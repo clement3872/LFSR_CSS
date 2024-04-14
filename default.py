@@ -59,19 +59,27 @@ class LFSR:
         Returns: Check if there are different values during the 2^n - 1 iterations
         """
         # check duplicates
+        old_last_output = self.last_output # we have to back up this
+        start = self.current_status.copy()
         l_iterations = []
         for i in range(2**len(self.initial_status) - 1):
             self.next_status()
             if self.current_status in l_iterations:
                 print("There is a duplicate at iteration number",i+1)
                 print("start:", start)
-                print("xor_list:", xor_list)
+                print("xor_list:", self.xor_list)
                 print("current_status", self.current_status)
-                self.reset()
+                # reset status
+                self.last_output = old_last_output
+                self.current_status = start.copy()
+                self.nb_iteration -= i
                 return False
             else:
                 l_iterations.append(self.current_status.copy())
-        self.reset()
+        # reset status
+        self.last_output = old_last_output
+        self.current_status = start.copy()
+        self.nb_iteration -= i
         return True
 
     
@@ -100,8 +108,26 @@ def test1():
     l = LFSR(start, xor_list) 
     l.check_duplicates()
 
+def test2():
+    """
+    Example for an LFSR of 25 bits.
+    This may take even more time than for 17 bits.
+    """
+    n = 25
+    start = [rd.randint(0,1) for _ in range(n)]
+    while 1 not in start: start = [rd.randint(0,1) for _ in range(n)]
+    xor_list = [rd.randint(0,1) for _ in range(n-1)]
+    while True not in xor_list: xor_list = [rd.randint(0,1) for _ in range(n-1)]
+
+    l = LFSR(start, xor_list) 
+    l.check_duplicates()
+
+
 
 if __name__ == "__main__":
+    # NOTE : not every LFSR have a "cycle" of 2^n - 1 iterations 
+
     # test0()
-    # test1() # This test may take a bit of time 
+    # test1() # This test may take a bit of time
+    # test2() # This will take even more time
     pass
