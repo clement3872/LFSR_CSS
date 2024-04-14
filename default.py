@@ -3,11 +3,11 @@ import random as rd
 def xor(a,b):
     """
     args: a and b must be between 0 and 1
-    Returns a xor b
+    Returns: a xor b
     """
     assert a in (0,1), "xor(a,b): a must be in (0,1)"
     assert b in (0,1), "xor(a,b): b must be in (0,1)"
-    return 0 if a==b else max(a,b)
+    return (a+b)%2
 
 class LFSR:
     def __init__(self, status, xor_list, last_output=None):
@@ -19,40 +19,89 @@ class LFSR:
                           else None
         """
         # some asserts for "security"
-        assert len(status)==len(xor_list), "LFSR: len(status) and len(xor_list) should be equal"
+        assert 1 in status, "There should be a 1 in the list `status`"
+        assert len(status)==len(xor_list)+1, "LFSR: len(status) == len(xor_list)+1 should be true"
         # assert last_output in (None,0,1), "LFSR: last_output should be in (None,0,1)"
-        for i in range(len(status)):
+        for i in range(len(status)-1): 
             assert status[i] in (0,1), f"LFSR: status[{i}] should be in (0,1)"
             assert xor_list[i] in (False,True), f"LFSR: xor_list[{i}] should be in (0,1)"
+        assert status[-1] in (0,1), f"LFSR: status[{len(status)}] should be in (0,1)"
 
-        self.start = status
-        self.xor_list = xor_list
+        self.initial_status = status.copy()
+        self.xor_list = xor_list.copy()
 
-        self.current_status = status
+        self.current_status = status.copy()
         self.last_output = last_output
+        self.nb_iteration = 0
     
     def next_status(self):
-        """ Returns the next bit of the LFSR"""
+        """Returns the next bit of the LFSR"""
         self.last_output = self.current_status[-1]
         tmp = self.last_output
         for i in range(len(self.xor_list)):
-            if xor_list[i]:
+            if self.xor_list[i] == 1:
                 tmp = xor(self.current_status[i], tmp)
         
         # shifting the list
         self.last_output = self.current_status.pop()
         self.current_status = [tmp] + self.current_status
+        self.nb_iteration += 1
 
         return self.last_output
+    
+    def reset(self):
+        self.current_status = self.initial_status.copy()
+        self.last_output = None
+        self.nb_iteration = 0
+    
+    def check_duplicates(self):
+        """
+        Returns: Check if there are different values during the 2^n - 1 iterations
+        """
+        # check duplicates
+        l_iterations = []
+        for i in range(2**len(self.initial_status) - 1):
+            self.next_status()
+            if self.current_status in l_iterations:
+                print("There is a duplicate at iteration number",i+1)
+                print("start:", start)
+                print("xor_list:", xor_list)
+                print("current_status", self.current_status)
+                self.reset()
+                return False
+            else:
+                l_iterations.append(self.current_status.copy())
+        self.reset()
+        return True
+
+    
+
+
+def test0():
+    # First example from the PDF (on 8 bits)
+
+    start = [1,0,0,1,0,1,1,0]
+    xor_list = [0,0,0,1,1,1,0]
+    l = LFSR(start, xor_list)
+    l.check_duplicates()
+
+
+def test1():
+    """
+    Example for an LFSR of 17 bits.
+    This may take a bit of time.
+    """
+    n = 17
+    start = [rd.randint(0,1) for _ in range(n)]
+    while 1 not in start: start = [rd.randint(0,1) for _ in range(n)]
+    xor_list = [rd.randint(0,1) for _ in range(n-1)]
+    while True not in xor_list: xor_list = [rd.randint(0,1) for _ in range(n-1)]
+
+    l = LFSR(start, xor_list) 
+    l.check_duplicates()
 
 
 if __name__ == "__main__":
-    # here is an example of how to use it
-    
-    start = [1,0,0,1,0,1,1,0]
-    xor_list = [False, False, False, True, True, True, False, False]
-    
-    l = LFSR(start, xor_list)
-    for _ in range(8): 
-        l.next_status()
-        print(l.last_output, l.current_status)
+    # test0()
+    # test1() # This test may take a bit of time 
+    pass
