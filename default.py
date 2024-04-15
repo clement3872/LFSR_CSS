@@ -1,13 +1,5 @@
 import random as rd
 
-def xor(a,b):
-    """
-    args: a and b must be between 0 and 1
-    Returns: a xor b
-    """
-    assert a in (0,1), "xor(a,b): a must be in (0,1)"
-    assert b in (0,1), "xor(a,b): b must be in (0,1)"
-    return (a+b)%2
 
 class LFSR:
     def __init__(self, status, xor_list, last_output=None):
@@ -40,7 +32,7 @@ class LFSR:
         tmp = self.last_output
         for i in range(len(self.xor_list)):
             if self.xor_list[i] == 1:
-                tmp = xor(self.current_status[i], tmp)
+                tmp = self.current_status[i]^tmp # `^` is a XOR
         
         # shifting the list
         self.last_output = self.current_status.pop()
@@ -56,15 +48,14 @@ class LFSR:
     
     def check_duplicates(self):
         """
-        Returns: Check if there are different values during the 2^n - 1 iterations
+        Returns: Check if there is a cycle before 2^n - 1 iterations
         """
         # check duplicates
         old_last_output = self.last_output # we have to back up this
         start = self.current_status.copy()
-        l_iterations = []
-        for i in range(2**len(self.initial_status) - 1):
+        for i in range(2**len(self.initial_status) - 2): # First one is included
             self.next_status()
-            if self.current_status in l_iterations:
+            if self.current_status == start:
                 print("There is a duplicate at iteration number",i+1)
                 print("start:", start)
                 print("xor_list:", self.xor_list)
@@ -74,16 +65,58 @@ class LFSR:
                 self.current_status = start.copy()
                 self.nb_iteration -= i
                 return False
-            else:
-                l_iterations.append(self.current_status.copy())
         # reset status
         self.last_output = old_last_output
         self.current_status = start.copy()
         self.nb_iteration -= i
         return True
 
-    
 
+class CSS:
+    def __init__(self, lfsr1, lfsr2):
+        self.lfsr1 = lfsr1
+        self.lfsr2 = lfsr2
+        self.c = 0
+    
+    
+    def reset(self):
+        self.lfsr1.reset()
+        self.lfsr2.reset()
+        self.c = 0
+
+    def encode(self, m):
+        """
+        `m` must be a string composed by numbers in hexadecimal (0<m<ff)
+        AND len(m) must be even
+        -
+        Note: This function is very close of the algo that our teacher gave us.
+        """
+        s = ""
+        for i in range(len(m)//2):
+            x = ""
+            for el in reversed([self.lfsr1.next_status() for _ in range(8)]):
+                x += str(el)
+            x = int(x, 2) 
+            y = ""
+            for el in reversed([self.lfsr2.next_status() for _ in range(8)]):
+                y += str(el)
+            y = int(y, 2)
+
+            res = (x+y+self.c)%256
+            tmp = int(m[2*i]+m[2*i+1], 16)
+            s += hex(tmp^res)[2:]
+
+            self.c = 1 if x+y>255 else 0
+        self.reset()
+        return s
+    
+    def decode(self, c):
+        # It's symmetrical
+        return self.encode(c)
+
+
+
+######### TESTINT PART
 
 def test0():
     # First example from the PDF (on 8 bits)
@@ -93,17 +126,14 @@ def test0():
     l = LFSR(start, xor_list)
     l.check_duplicates()
 
-
 def test1():
     """
     Example for an LFSR of 17 bits.
     This may take a bit of time.
     """
     n = 17
-    start = [rd.randint(0,1) for _ in range(n)]
-    while 1 not in start: start = [rd.randint(0,1) for _ in range(n)]
-    xor_list = [rd.randint(0,1) for _ in range(n-1)]
-    while True not in xor_list: xor_list = [rd.randint(0,1) for _ in range(n-1)]
+    start = [0 for _ in range(n)]; start[16]=1; start.reverse()
+    xor_list = [0 for _ in range(n)]; xor_list[14]=1; xor_list.reverse();xor_list.pop()
 
     l = LFSR(start, xor_list) 
     l.check_duplicates()
@@ -114,20 +144,42 @@ def test2():
     This may take even more time than for 17 bits.
     """
     n = 25
-    start = [rd.randint(0,1) for _ in range(n)]
-    while 1 not in start: start = [rd.randint(0,1) for _ in range(n)]
-    xor_list = [rd.randint(0,1) for _ in range(n-1)]
-    while True not in xor_list: xor_list = [rd.randint(0,1) for _ in range(n-1)]
+    start = [0 for _ in range(n)]; start[24]=1; start.reverse()
+    xor_list = [0 for _ in range(n)]; xor_list[12]=1; xor_list[4]=1; xor_list[3]=1
+    xor_list.reverse();xor_list.pop()
 
     l = LFSR(start, xor_list) 
     l.check_duplicates()
 
 
+def test3():
+    n = 17
+    start = [0 for _ in range(n)]; start[16]=1; start.reverse()
+    xor_list = [0 for _ in range(n)]; xor_list[14]=1; xor_list.reverse();xor_list.pop()
+    l1 = LFSR(start, xor_list) 
+
+    n = 25
+    start = [0 for _ in range(n)]; start[24]=1; start.reverse()
+    xor_list = [0 for _ in range(n)]; xor_list[12]=1; xor_list[4]=1; xor_list[3]=1
+    xor_list.reverse();xor_list.pop()
+    l2 = LFSR(start, xor_list) 
+
+    css = CSS(l1,l2)
+    m = "ffffffffff"
+
+    print(f"The message: {m}")
+
+    c = css.encode(m)
+    print(f"Encoded message: {c}")
+    print(f"Decoding the encoded message: {css.decode(c)}") # verification
+
 
 if __name__ == "__main__":
     # NOTE : not every LFSR have a "cycle" of 2^n - 1 iterations 
 
-    # test0()
-    # test1() # This test may take a bit of time
-    # test2() # This will take even more time
+    #test0()
+    #test1()
+    #test2() # This test may take a bit of time
+
+    test3()
     pass
