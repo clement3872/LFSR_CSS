@@ -11,7 +11,7 @@ class LFSR:
         # some asserts for "security"
         assert type(status) is int, "`status` should be of type int (bin)"
         assert status > 0, "There should be a 1 in the list `status`"
-        assert type(size) is int and size>=status.bit_count(), "The size is wrong"
+        #assert type(size) is int and size>=status.bit_count(), "The size is wrong" # only after python 3.10
 
         self.size = size-1
         self.initial_status = status
