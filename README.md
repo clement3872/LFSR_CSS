@@ -1,44 +1,34 @@
-# LFSR_CSS
+# LFSR Module
 
----
-
-# LFSR (Linear Feedback Shift Register) Module
-
-## Overview
-This module implements a basic Linear Feedback Shift Register (LFSR), which is a shift register that takes the exclusive OR (XOR) of a subset of its bits, shifts the bits, and inserts the XOR result back into the register. LFSRs are useful in cryptography, digital signal processing, and other areas where pseudo-randomly generated sequences are required.
+This module contains the implementation of a Linear Feedback Shift Register (LFSR), a mechanism used to generate pseudo-random binary sequences. LFSRs are widely used in fields such as cryptography and digital communication, particularly in the generation and analysis of stream ciphers.
 
 ## Features
-- Initialize an LFSR with a specified size, status, and list of XOR tap positions.
-- Generate the next bit in the sequence with simple method calls.
-- Allows continuation from a specified status using `last_output`.
 
-## Requirements
-This module requires Python 3.x.
+- **Customizable Size:** Set the register size according to your needs.
+- **Initial Status Setup:** Begin with a predefined status to maintain consistency across operations.
+- **XOR List:** Define custom XOR taps for the feedback function.
+- **Continuation Capability:** Optionally continue from the last output of a previous LFSR run.
 
 ## Usage
-To use the LFSR class in your Python scripts, follow these steps:
 
-1. Import the LFSR class from this module.
-2. Create an instance of LFSR by specifying the size, initial status, and the positions that should be XORed.
-3. Call the `next()` method to generate the next bit in the sequence.
+1. **Initialization:** Create an instance of the LFSR class with the desired size, initial status, and XOR taps.
+2. **Generate Sequence:** Use the instance methods to generate or manipulate the sequence as per your application requirements.
 
-### Example
+## Example
+
 ```python
-from default import LFSR  # Assuming the file is named default.py
+# Create an LFSR instance
+lfsr = LFSR(size=16, status=0b1011011100110110, xor_list=[1, 5, 6])
 
-# Create an LFSR instance with specific parameters
-lfsr = LFSR(size=16, status=0b1100101, xor_list=[1, 5, 6])
-
-# Generate the next bit
-print(lfsr.next())
+# Generate a sequence or perform other operations
+output = lfsr.next_bit()
+print(f"Output bit: {output}")
 ```
 
-## Contributions
-Contributions to this project are welcome. Please fork the repository, make your changes, and submit a pull request.
+## Applications in Cryptanalysis
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+LFSRs have a known vulnerability when used in certain stream cipher configurations, such as those found in the Content Scramble System (CSS) used for DVD encryption. This module can simulate LFSR sequences that might be used in cryptanalytic attacks to understand or exploit weaknesses in these systems.
 
----
+## Requirements
 
-This is a basic README template, and you can adjust the contents based on additional functionality in your code or any other specific instructions you might have. If you need to include more details about the methods or expand on the example usage, let me know!
+- Python 3.7 or higher
