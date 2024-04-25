@@ -222,8 +222,7 @@ def testattack():
     time.sleep(3)
     css = CSS(lfsr17, lfsr25)
 
-    
-    # Informations connues par l'attaquant, les 6 premiers octets de sorties
+    # Information known by the attacker, the first 6 output bytes
     z_1 = css.next()
     z_2 = css.next()
     z_3 = css.next()
