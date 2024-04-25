@@ -205,6 +205,66 @@ class Attack:
 
 
 ######### TESTINT PART
+
+def test0():
+    # First example from the PDF (on 8 bits)
+    start = 0b10010110
+    xor_list = (2,3,4)
+    l = LFSR(8,start, xor_list)
+    l.check_duplicates()
+
+def test1():
+    """
+    Example for an LFSR of 17 bits.
+    This may take a bit of time.
+    (question 1)
+    """
+    n = 17
+    start = 1 << (n-1) #"1" + (n-1)*"0"
+    xor_list = (14,0)
+
+    l = LFSR(n, start, xor_list) 
+    l.check_duplicates()
+
+def test2():
+    """
+    Example for an LFSR of 25 bits.
+    This may take even more time than for 17 bits.
+    (question 2)
+    """
+    n = 25
+    start = 1 << (n-1) 
+    xor_list = (12,4,3,0)
+
+    l = LFSR(n, start, xor_list) 
+    l.check_duplicates()
+
+
+def test3():
+    """
+    (question 3)
+    """
+    n = 17
+    start = 1 << (n-1) 
+    xor_list = (14,0)
+    l1 = LFSR(n, start, xor_list) 
+
+    n = 25
+    start = 1 << (n-1) 
+    xor_list = (12,4,3,0)
+    l2 = LFSR(n, start, xor_list) 
+
+    css = CSS(l1,l2)
+    m = "ffffffffff"
+
+    print(f"The message: {m}")
+
+    c = css.encode(m)
+    print(f"Encoded message: {c}")
+    print(f"Decoding the encoded message: {css.decode(c)}") # verification
+
+
+
 import time
 import random as rd
 def testattack():
@@ -243,6 +303,12 @@ def testattack():
 
 if __name__ == "__main__":
     # NOTE : not every LFSR have a "cycle" of 2^n - 1 iterations 
+
+    # test0()
+    # test1()
+    # test2()
+    # test3()
+
     import time
     t0 = time.perf_counter()
     testattack()
