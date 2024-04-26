@@ -1,3 +1,7 @@
+import time
+import random as rd
+
+
 class LFSR:
     def __init__(self,size, status, xor_list, last_output=None):
         """
@@ -265,8 +269,6 @@ def test3():
 
 
 
-import time
-import random as rd
 def testattack():
     init = rd.randint(0, 0b1111111111111111111111111111111111111111)
     print("Random value: ")
@@ -301,17 +303,21 @@ def testattack():
     else:
         print("No key was found.")
 
-if __name__ == "__main__":
-    # NOTE : not every LFSR have a "cycle" of 2^n - 1 iterations 
 
-    # test0()
-    # test1()
-    # test2()
-    # test3()
-
-    import time
+def test6():
     t0 = time.perf_counter()
     testattack()
 
     t1 = time.perf_counter()
     print("Execution time: ", t1 - t0)
+
+
+if __name__ == "__main__":
+
+    # test0()
+    # test1()
+    # test2()
+    # test3()
+    # test6()
+    
+    pass
