@@ -31,4 +31,21 @@ LFSRs have a known vulnerability when used in certain stream cipher configuratio
 
 ## Requirements
 
-- Python 3.7 or higher
+- This module requires Python 3.x.
+
+## Testing
+### Running Test Functions
+At the end of the code, there are several test functions that you can uncomment to check the behavior of the LFSR implementation. These tests help verify various aspects of the LFSR under different conditions and configurations.
+
+To run the tests, uncomment the test function calls in the `if __name__ == "__main__":` block at the end of the script. Not every LFSR configuration will have a cycle of 2^n - 1 iterations, so these tests can help ensure your specific setup works correctly.
+
+```python
+if __name__ == "__main__":
+    # To test the LFSR functionality, uncomment the desired test functions below:
+
+    test0() # Test LFSR with 8-bit register to ensure no duplicate sequences
+    test1() # Test LFSR with 17-bit register to ensure no duplicate sequences
+    test2() # Test LFSR with 25-bit register to ensure no duplicate sequences
+    test3() # Test encoding with message '0xffffffffff' expecting output '0xffffb66c39'
+    test6() # Simulate an attack on Content Scrambling System (CSS) using LFSR
+```
