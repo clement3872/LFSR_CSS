@@ -1,3 +1,6 @@
+Sophie Wu
+Clement Marchal
+
 # LFSR Module
 
 This module contains the implementation of a Linear Feedback Shift Register (LFSR), a mechanism used to generate pseudo-random binary sequences. LFSRs are widely used in fields such as cryptography and digital communication, particularly in the generation and analysis of stream ciphers.
