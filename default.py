@@ -270,6 +270,10 @@ def test3():
 
 
 def testattack():
+    """
+    (question 6)
+    Test for the attack 
+    """
     init = rd.randint(0, 0b1111111111111111111111111111111111111111)
     print("Random value: ")
     print("============================================================")
@@ -304,6 +308,9 @@ def testattack():
 
 
 def test6():
+    """
+    If you want to know how long it takes
+    """
     t0 = time.perf_counter()
     testattack()
 
@@ -317,6 +324,7 @@ if __name__ == "__main__":
     # test1()
     # test2()
     # test3()
+    # testattack()
     # test6()
     
     pass
